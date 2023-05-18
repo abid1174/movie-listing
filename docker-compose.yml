@@ -1,0 +1,46 @@
+version: '3.4'
+
+services:
+
+  movie-list-client:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    working_dir: /app/client
+    networks:
+      - movie-list-net
+    ports:
+      - 3000:3000
+    command: npm run dev
+    volumes:
+      - ./client:/app/client
+      - /app/client/node_modules
+
+
+  movie-list-postgres:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USERNAME: postgres 
+      POSTGRES_DB: movie
+    networks:
+      - movie-list-net
+
+  movie-list-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile 
+    working_dir: /app/server 
+    networks:
+      - movie-list-net
+    ports:
+      - 8000:3000
+    depends_on:
+      - movie-list-postgres
+    command: [sh, -c, 'npm run start:dev']
+    volumes:
+      - ./server:/app/server
+      - /app/server/node_modules
+
+networks:
+  movie-list-net: 
