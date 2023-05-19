@@ -16,31 +16,36 @@ services:
       - ./client:/app/client
       - /app/client/node_modules
 
-
-  movie-list-postgres:
-    image: postgres:12-alpine
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USERNAME: postgres 
-      POSTGRES_DB: movie
-    networks:
-      - movie-list-net
-
   movie-list-server:
     build:
       context: ./server
       dockerfile: Dockerfile 
     working_dir: /app/server 
-    networks:
-      - movie-list-net
+    # networks:
+    #   - movie-list-net
     ports:
       - 8000:3000
     depends_on:
       - movie-list-postgres
-    command: [sh, -c, 'npm run start:dev']
+    command: [sh, -c, 'npm run dev']
     volumes:
       - ./server:/app/server
       - /app/server/node_modules
+    environment:
+      - POSTGRES_HOST=movie-list-postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DATABASE=movie
+
+  movie-list-postgres:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USERNAME: postgres
+      POSTGRES_DB: movie
+    ports:
+      - '5432:5432'
 
 networks:
-  movie-list-net: 
+  movie-list-net:
