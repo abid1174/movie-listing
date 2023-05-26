@@ -1,5 +1,3 @@
+import { UserEntity } from '../entity/user.entity';
 
-export interface User {
-    name: string;
-    email: string;
-}
+export interface IUser extends Partial<UserEntity> {}
