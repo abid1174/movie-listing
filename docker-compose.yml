@@ -1,7 +1,6 @@
 version: '3.4'
 
 services:
-
   movie-list-client:
     build: 
       context: ./client
@@ -27,16 +26,13 @@ services:
       - 8000:3000
     depends_on:
       - movie-list-postgres
-    command: [sh, -c, 'npm run dev']
+    command: npm run dev
     volumes:
       - ./server:/app/server
       - /app/server/node_modules
-    environment:
-      - POSTGRES_HOST=movie-list-postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USERNAME=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DATABASE=movie
+    env_file:
+      - ./server/.env
+
 
   movie-list-postgres:
     image: postgres:12-alpine

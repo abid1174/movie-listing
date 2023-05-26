@@ -1,5 +1,9 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
+import { Public } from '../auth/decorator/public.decorator';
+import { CreateUserDto } from './dto/createUser.dto';
+import { plainToInstance } from 'class-transformer';
+import { UserResponseDto } from './dto/userResponse.dto';
 
 @Controller('user')
 export class UserController {
@@ -7,11 +11,16 @@ export class UserController {
 
   @Get()
   getUsers() {
-    return this.userService.findUser();
+    // return this.userService.findUser();
   }
 
   @Post()
-  create() {
-    return this.userService.createUser();
+  @Public()
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async signup(@Body() createUserDto: CreateUserDto) {
+    return plainToInstance(
+      UserResponseDto,
+      await this.userService.createUser(createUserDto)
+    )
   }
 }
